@@ -300,10 +300,10 @@ function create_python_venv() {
     source "$VENV_PATH/bin/activate"
 
     if [ "$USE_UV" == "true" ]; then
-        export PIP_COMMAND="uv pip"
-        if ! command -v uv &>>"$LOG_FILE"; then
-            pip3 install --no-cache-dir "uv>=0.4.10" &>>"$LOG_FILE"
-        fi
+        export PIP_COMMAND="pip"
+        #if ! command -v uv &>>"$LOG_FILE"; then
+        #    pip3 install --no-cache-dir "uv>=0.4.10" &>>"$LOG_FILE"
+        #fi
     else
         export PIP_COMMAND="pip3"
     fi
