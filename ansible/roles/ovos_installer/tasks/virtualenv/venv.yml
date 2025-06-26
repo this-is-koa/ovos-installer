@@ -44,31 +44,40 @@
   when: item.state | bool
 
 - name: Create {{ ovos_installer_user_home }}/.venvs/ovos Python venv with tflite_runtime
-  moreati.uv.pip:
+  ansible.builtin.pip:
     name: tflite_runtime
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
     virtualenv_command: "{{ ansible_python.executable }} -m venv"
-    extra_args: "--trusted-host whl.smartgic.io -f 'https://whl.smartgic.io'"
+    extra_args: "--trusted-host whl.smartgic.io -f https://whl.smartgic.io"
   when: ovos_installer_cpu_is_capable | bool
+  ignore_errors: yes
+  register: tflite_install_result
+
+- name: Warn if tflite_runtime installation failed
+  ansible.builtin.debug:
+    msg: "tflite_runtime installation failed. This is optional for wake word detection. You can use alternative wake word engines."
+  when: 
+    - ovos_installer_cpu_is_capable | bool
+    - tflite_install_result is failed
 
 - name: Create {{ ovos_installer_user_home }}/.venvs/ovos Python venv without tflite_runtime
-  moreati.uv.pip:
+  ansible.builtin.pip:
     name: wheel
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
     virtualenv_command: "{{ ansible_python.executable }} -m venv"
   when: not ovos_installer_cpu_is_capable | bool
 
 - name: Install ggwave Python library
-  moreati.uv.pip:
+  ansible.builtin.pip:
     name: ggwave
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
-    extra_args: "--trusted-host whl.smartgic.io -f 'https://whl.smartgic.io'"
+    extra_args: "--trusted-host whl.smartgic.io -f https://whl.smartgic.io"
   when: ansible_architecture == "aarch64" or ansible_architecture == "x86_64"
 
 - name: Install Open Voice OS in Python venv
   vars:
     _pip_args: "{{ '--pre' if ovos_installer_channel == 'development' else '' }}"
-  moreati.uv.pip:
+  ansible.builtin.pip:
     requirements: "{{ item.file }}"
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
     extra_args: "{{ _pip_args }}"
@@ -111,7 +120,7 @@
     - skip_ansible_lint
 
 - name: Ensure numpy==1.26.4 Python library is installed
-  moreati.uv.pip:
+  ansible.builtin.pip:
     name: numpy==1.26.4
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
     state: present
