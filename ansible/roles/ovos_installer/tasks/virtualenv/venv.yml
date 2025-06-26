@@ -73,6 +73,15 @@
     virtualenv: "{{ ovos_installer_user_home }}/.venvs/ovos"
     extra_args: "--trusted-host whl.smartgic.io -f https://whl.smartgic.io"
   when: ansible_architecture == "aarch64" or ansible_architecture == "x86_64"
+  ignore_errors: yes
+  register: ggwave_install_result
+
+- name: Warn if ggwave installation failed
+  ansible.builtin.debug:
+    msg: "ggwave installation failed. This is optional for audio pairing. You can use alternative methods."
+  when: 
+    - ansible_architecture == "aarch64" or ansible_architecture == "x86_64"
+    - ggwave_install_result is failed
 
 - name: Install Open Voice OS in Python venv
   vars:
