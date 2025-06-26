@@ -22,7 +22,8 @@ ovos-tts-plugin-ahotts
 {% endif %}
 
 {% if (ansible_architecture == "x86_64") or (ansible_architecture == "aarch64") %}
-ovos-audio-transformer-plugin-ggwave
+# Disabled due to Python 3.12 incompatibility
+# ovos-audio-transformer-plugin-ggwave
 {% endif %}
 
 {% if ovos_installer_cpu_is_capable | bool %}
